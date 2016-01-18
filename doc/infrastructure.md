@@ -8,7 +8,7 @@ requesting data from the corresponding API.  As data is streaming into the data
 dispatcher, it forwards bits of data to the relevant data service for
 processing.
 
-![](figures/infrastructure.svg)
+![](./figures/infrastructure.svg)
 
 For example, user A goes to the front-end and oauths for gmail.  On successful
 oauth, the token with user information is sent to the data dispatcher.  The
