@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""
-http://pycryptodome.readthedocs.org/en/latest/src/examples.html
-"""
 import pickle
 from Crypto.Cipher import AES, PKCS1_OAEP
 from Crypto.Random import get_random_bytes
@@ -14,6 +11,13 @@ class InvalidData(Exception):
 class SecureDict(dict):
     def __init__(self, private_key=None, public_key=None, data=None,
                  serializer=pickle, AES_bytes=32):
+        """
+        Create a dictionary-like object with RSA+AES encryption of it's data
+        (NOTE: keys are in plaintext, data is serialized using the provided
+        serializer).  In order to fill the object with data, a `public_key`
+        must be provided.  In order to read from the object, a `private_key`
+        must be provided.
+        """
         self.private_key = PKCS1_OAEP.new(private_key)
         self.public_key = PKCS1_OAEP.new(public_key)
         self.serializer = serializer
