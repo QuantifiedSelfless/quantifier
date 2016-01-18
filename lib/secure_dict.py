@@ -18,18 +18,20 @@ class SecureDict(dict):
         must be provided.  In order to read from the object, a `private_key`
         must be provided.
         """
-        self.private_key = PKCS1_OAEP.new(private_key)
-        self.public_key = PKCS1_OAEP.new(public_key)
+        self.private_key = private_key
+        self.public_key = public_key
+        private_crypto = PKCS1_OAEP.new(private_key)
+        public_crypto = PKCS1_OAEP.new(public_key)
         self.serializer = serializer
 
         self.AES_bytes = AES_bytes
 
         data = data or {}
         try:
-            self.session = self.private_key.decrypt(data['__session'])
+            self.session = private_crypto.decrypt(data['__session'])
         except KeyError:
             self.session = get_random_bytes(AES_bytes)
-            data['__session'] = self.public_key.encrypt(self.session)
+            data['__session'] = public_crypto.encrypt(self.session)
         super().__init__(data)
 
     def _aes(self, iv):
@@ -69,3 +71,7 @@ class SecureDict(dict):
 
     def export(self):
         return super().copy()
+
+    def export_keys(self, method='PEM'):
+        return self.private_key.exportKey(method), \
+            self.public_key.exportKey(method)
