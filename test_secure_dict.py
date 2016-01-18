@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from Crypto.PublicKey import RSA
 from secure_dict import SecureDict, InvalidData
+from Crypto.Random import get_random_bytes
 
 
 rsa1 = RSA.generate(1024)
@@ -56,11 +57,9 @@ def test_load_existing_fail():
     data = sd.export()
 
     assert data['foo'] != 'bar'
-
-    sd2 = SecureDict(priv_rsa2, None, data)
     try:
-        sd2['foo'] != 'bar'
-    except InvalidData:
+        SecureDict(priv_rsa2, None, data)
+    except ValueError:
         pass
 
 
@@ -90,3 +89,20 @@ def test_update():
     for k, v in data.items():
         assert v != sd.export()[k]
         assert v == sd[k]
+
+
+def test_large_chunk():
+    data = "bar" * (1 << 15)
+    sd = SecureDict(priv_rsa, pub_rsa)
+    sd['foo'] = data
+    assert sd.export()['foo'] != data
+    assert sd['foo'] == data
+
+
+def test_random_large_chunk():
+    sd = SecureDict(priv_rsa, pub_rsa)
+    for i in range(100):
+        data = get_random_bytes(1 << 15)
+        sd['foo'] = data
+        assert sd.export()['foo'] != data
+        assert sd['foo'] == data
