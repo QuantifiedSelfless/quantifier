@@ -1,0 +1,3 @@
+tornado
+pycrypto
+git+https://github.com/mynameisfiber/secret-sharing.git
